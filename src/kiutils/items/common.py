@@ -479,12 +479,10 @@ class Effects():
 
         object = cls()
         for item in exp:
-            if type(item) != type([]):
-                if item == 'hide': object.hide = True
-                else: continue
             if item[0] == 'font': object.font = Font().from_sexpr(item)
             if item[0] == 'justify': object.justify = Justify().from_sexpr(item)
             if item[0] == 'href': object.href = item[1]
+            if item[0] == 'hide': object.hide = item[1] == "yes"
         return object
 
     def to_sexpr(self, indent=0, newline=True) -> str:
