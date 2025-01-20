@@ -178,8 +178,8 @@ class SymbolPin():
 
         hide = ' hide' if self.hide else ''
         posA = f' {self.position.angle}' if self.position.angle is not None else ''
-        nameEffects = f' {self.nameEffects.to_sexpr(newline=False)}' if self.nameEffects is not None else ''
-        numberEffects = f' {self.numberEffects.to_sexpr(newline=False)}' if self.numberEffects is not None else ''
+        #nameEffects = f'{self.nameEffects.to_sexpr(newline=True)}' if self.nameEffects is not None else ''
+        #numberEffects = f'{self.numberEffects.to_sexpr(newline=True)}' if self.numberEffects is not None else ''
 
         expression =  f'{indent_char*indent}(pin {self.electricalType} {self.graphicalStyle}\n'
         expression += f'{indent_char*(indent+1)}(at {self.position.X} {self.position.Y}{posA})\n'
@@ -190,18 +190,21 @@ class SymbolPin():
         # the same line.
         # Constrained in: schematic/since_v7/test_symbolPinOptionalTokens
         if self.nameEffects is None and self.numberEffects is None:
-            expression += f'{indent_char*(indent+1)}(name "{dequote(self.name)}")\n'
+            
             expression += f'{indent_char*(indent+1)}(number "{dequote(self.number)}")\n'
-              
-        else:
-            expression += f'{indent_char*(indent+1)}(name "{dequote(self.name)}"\n'
-            expression += f'{indent_char*(indent+2)}{nameEffects}'
-            expression += f'{indent_char*(indent+2)})\n'
+        
+        expression += f'{indent_char*(indent+1)}(name "{dequote(self.name)}"'
+        if not self.nameEffects: expression += ')\n'
+        else : 
+            expression += f'\n{self.nameEffects.to_sexpr(indent+2, True)}'
+            expression += f'{indent_char*(indent+1)})\n'
+            newLineAdded = True
 
-            expression += f'{indent_char*(indent+1)}(number "{dequote(self.number)}"\n'
-            expression += f'{indent_char*(indent+2)}{numberEffects}'
-            expression += f'{indent_char*(indent+2)})\n'
-           
+        expression += f'{indent_char*(indent+1)}(number "{dequote(self.number)}"'
+        if not self.numberEffects: expression += ')\n'
+        else :
+            expression += f'\n{self.numberEffects.to_sexpr(indent+2, True)}'
+            expression += f'{indent_char*(indent+1)})\n'
             newLineAdded = True
 
         # Alternative pins always generate a line break
@@ -212,10 +215,8 @@ class SymbolPin():
             for alternativePin in self.alternatePins:
                 expression += alternativePin.to_sexpr(indent+2)
 
-        if newLineAdded:
-            expression += f'{indent_char*(indent+2)}){endline}'
-        else:
-            expression += f'{indent_char*(indent+1)}){endline}'
+        
+        expression += f'{indent_char*(indent)}){endline}'
         return expression
 
 @dataclass
@@ -467,8 +468,7 @@ class Symbol():
         Returns:
             - str: S-Expression of this object
         """
-        indent_char = '\t'
-        #indents = '\t' * indent
+        indent_char = '\t'        
         endline = '\n' if newline else ''
         obtext, ibtext = '', ''
 
@@ -479,20 +479,27 @@ class Symbol():
             obtext = 'yes' if self.onBoard else 'no'
         excludefromsim = f'(exclude_from_sim {"yes" if self.excludeFromSim else "no"})' if self.excludeFromSim is not None else ''
         onboard = f'(on_board {obtext})' if self.onBoard is not None else ''
-        power = f'(power)' if self.isPower else ''
-        pnhide = f' hide' if self.pinNamesHide else ''
-        pnoffset = f'(offset {self.pinNamesOffset})' if self.pinNamesOffset is not None else ''
-        pinnames = f'(pin_names{pnoffset}{pnhide})' if self.pinNames else ''
+        power = f'(power)' if self.isPower else ''        
         pinnumbers = f'(pin_numbers hide)' if self.hidePinNumbers else ''
         extends = f'(extends "{dequote(self.extends)}")' if self.extends is not None else ''
 
         expression = f'{indent_char * indent}(symbol "{dequote(self.libId)}"\n'
-        if excludefromsim: expression += f'{indent_char * (indent+1)}{excludefromsim}\n'
+        # extends
         if extends: expression += f'{indent_char * (indent+1)}{extends}\n'        
+        # power
         if power: expression += f'{indent_char * (indent+1)}{power}\n'
-        if pinnumbers: expression += f'{indent_char * (indent+1)}{pinnumbers}\n'
-        if pinnames: expression += f'{indent_char * (indent+1)}{pinnames}\n'
+        #pin_numbers
+        if pinnumbers: expression += f'{indent_char * (indent+1)}{pinnumbers}\n' 
+        #pin_names
+        if self.pinNames: expression += f'{indent_char * (indent+1)}(pin_names\n'
+        if self.pinNamesOffset: expression += f'{indent_char * (indent+2)}(offset {self.pinNamesOffset})\n'
+        if self.pinNamesHide: expression += f'{indent_char * (indent+2)}(hide {self.pinNamesHide})\n'
+        if self.pinNames: expression += f'{indent_char * (indent+1)})\n'       
+        # exclude_from_sim
+        if excludefromsim: expression += f'{indent_char * (indent+1)}{excludefromsim}\n'
+        # in_bom
         if inbom: expression += f'{indent_char * (indent+1)}{inbom}\n'
+        # on_board
         if onboard: expression += f'{indent_char * (indent+1)}{onboard}\n'
 
         for item in self.properties:
@@ -503,7 +510,7 @@ class Symbol():
             expression += item.to_sexpr(indent + 1)
         for item in self.units:
             expression += item.to_sexpr(indent + 1)
-        expression += f'{indent_char * (indent+1)}){endline}'
+        expression += f'{indent_char * indent}){endline}'
         return expression
 
 @dataclass

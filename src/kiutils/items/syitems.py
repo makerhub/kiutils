@@ -312,17 +312,20 @@ class SyPolyLine():
         Returns:
             - str: S-Expression of this object
         """
-        indents = ' '*indent
+        indent_char = '\t'        
         endline = '\n' if newline else ''
 
-        expression =  f'{indents}(polyline\n'
-        expression +=  f'{indents}  (pts\n'
-        for point in self.points:
-            expression +=  f'{indents}    (xy {point.X} {point.Y})\n'
-        expression += f'{indents}  )\n'
+        expression =  f'{indent_char*indent}(polyline\n'
+        expression +=  f'{indent_char*(indent+1)}(pts\n'
+        if len(self.points) > 0:  expression += indent_char*(indent+2)
+        for index, point in enumerate(self.points):
+            expression +=  f'(xy {point.X} {point.Y})'
+            if index < len(self.points)-1: expression += ' '
+
+        expression += f'\n{indent_char*(indent+1)})\n'
         expression += self.stroke.to_sexpr(indent+2)
         expression += self.fill.to_sexpr(indent+2)
-        expression += f'{indents}){endline}'
+        expression += f'{indent_char*indent}){endline}'
         return expression
 
 @dataclass
@@ -393,14 +396,16 @@ class SyRect():
         Returns:
             - str: S-Expression of this object
         """
-        indents = ' '*indent
+        indent_char = '\t'        
         endline = '\n' if newline else ''
         private = ' private' if self.private else ''
-
-        expression =  f'{indents}(rectangle{private} (start {self.start.X} {self.start.Y}) (end {self.end.X} {self.end.Y})\n'
-        expression += self.stroke.to_sexpr(indent+2)
-        expression += self.fill.to_sexpr(indent+2)
-        expression += f'{indents}){endline}'
+    
+        expression =  f'{indent_char*indent}(rectangle{private}\n'        
+        expression += f'{indent_char*(indent+1)}(start {self.start.X} {self.start.Y})\n'
+        expression += f'{indent_char*(indent+1)}(end {self.end.X} {self.end.Y})\n'                    
+        if self.stroke: expression += self.stroke.to_sexpr(indent+1)
+        if self.fill: expression += self.fill.to_sexpr(indent+1)        
+        expression += f'{indent_char*indent}){endline}'
         return expression
 
 @dataclass

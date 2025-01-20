@@ -261,11 +261,15 @@ class Stroke():
         Returns:
             - str: S-Expression of this object
         """
-        indents = '\t'*indent
-        endline = '\n' if newline else ''
-        color = f' {self.color.to_sexpr()}' if self.color is not None else ''
-        the_type = f' (type {self.type})' if self.type is not None else ''
-        return f'{indents}(stroke (width {self.width}){the_type}{color}){endline}'
+        indent_char = '\t'        
+        endline = '\n' if newline else ''        
+        
+        expression = f'{indent_char * indent}(stroke\n'
+        expression += f'{indent_char * (indent+1)}(width {self.width})\n'
+        if self.type: expression += f'{indent_char * (indent+1)}(type {self.type})\n'
+        if self.color: expression += self.color.to_sexpr(indent+1)
+        expression += f'{indent_char*indent}){endline}'
+        return expression
 
 
 
@@ -327,8 +331,8 @@ class Font():
         object = cls()
         for item in exp:
             if type(item) != type([]):
-                if item == 'bold': object.bold = True
-                if item == 'italic': object.italic = True
+                if item == 'bold': object.bold = True # Legacy Style
+                if item == 'italic': object.italic = True # Legacy Style
                 continue
             if item[0] == 'face': object.face = item[1]
             if item[0] == 'size':
@@ -337,6 +341,8 @@ class Font():
             if item[0] == 'thickness': object.thickness = item[1]
             if item[0] == 'line_spacing': object.lineSpacing = item[1]
             if item[0] == 'color': object.color = ColorRGBA.from_sexpr(item)
+            if item[0] == 'bold' and item[1] == 'yes': object.bold = True
+            if item[0] == 'italic' and item[1] == 'yes': object.italic = True
         return object
 
     def to_sexpr(self, indent=0, newline=False) -> str:
@@ -354,11 +360,11 @@ class Font():
         face_name, thickness, bold, italic, linespacing, color = '', '', '', '', '', ''
 
         if self.face is not None:        face_name = f'(face "{dequote(self.face)}") '
-        if self.thickness is not None:   thickness = f' (thickness {self.thickness})'
-        if self.bold == True:            bold = ' bold'
-        if self.italic == True:          italic = ' italic'
-        if self.lineSpacing is not None: linespacing = f' (line_spacing {self.lineSpacing})'
-        if self.color is not None:       color = f' {self.color.to_sexpr()}'
+        if self.thickness is not None:   thickness = f'(thickness {self.thickness})'
+        if self.bold == True:            bold = '(bold yes)'
+        if self.italic == True:          italic = '(italic yes)'
+        if self.lineSpacing is not None: linespacing = f'(line_spacing {self.lineSpacing})'
+        if self.color is not None:       color = f'{self.color.to_sexpr()}'
 
         expression = f'{indent_char * indent}(font\n'
         if face_name: expression += f'{indent_char * (indent+1)}{face_name}\n'
@@ -511,11 +517,11 @@ class Effects():
         href = f'(href "{dequote(self.href)}")' if self.href is not None else ''
 
         expression =  f'{indent_char*indent}(effects\n'
-        expression += f'{self.font.to_sexpr(indent=indent+1)}\n'
+        if self.font: expression += self.font.to_sexpr(indent=indent+1, newline=True)
         if justify: expression += f'{indent_char*(indent+1)}{justify}\n'
         if href: expression += f'{indent_char*(indent+1)}{href}\n'
         if hide: expression += f'{indent_char*(indent+1)}{hide}\n'
-        expression += f'{indent_char*(indent)})\n'
+        expression += f'{indent_char*indent}){endline}'
         return expression
 
 
@@ -1085,11 +1091,14 @@ class Fill():
         Returns:
             - str: S-Expression of this object
         """
-        indents = '\t'*indent
+        indent_char = '\t'
         endline = '\n' if newline else ''
-        color = f' {self.color.to_sexpr()}' if self.color is not None else ''
 
-        expression = f'{indents}(fill (type {self.type}){color}){endline}'
+        expression = f'{indent_char * indent}(fill\n'
+        if self.type: expression += f'{indent_char * (indent+1)}(type {self.type})\n'
+        if self.color: expression += self.color.to_sexpr(indent+1)
+        expression += f'{indent_char * indent}){endline}'
+        
         return expression
 
 @dataclass
