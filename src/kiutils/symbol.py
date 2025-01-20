@@ -172,7 +172,7 @@ class SymbolPin():
         Returns:
             - str: S-Expression of this object
         """
-        indents = '\t'*indent
+        indent_char = '\t'        
         endline = '\n' if newline else ''
         newLineAdded = False
 
@@ -181,16 +181,27 @@ class SymbolPin():
         nameEffects = f' {self.nameEffects.to_sexpr(newline=False)}' if self.nameEffects is not None else ''
         numberEffects = f' {self.numberEffects.to_sexpr(newline=False)}' if self.numberEffects is not None else ''
 
-        expression =  f'{indents}(pin {self.electricalType} {self.graphicalStyle} (at {self.position.X} {self.position.Y}{posA}) (length {self.length}){hide}'
+        expression =  f'{indent_char*indent}(pin {self.electricalType} {self.graphicalStyle}\n'
+        expression += f'{indent_char*(indent+1)}(at {self.position.X} {self.position.Y}{posA})\n'
+        expression +=  f'{indent_char*(indent+1)}(length {self.length})\n'
+        if hide != '': expression +=f'{indent_char*(indent+1)}{hide}\n'
         
         # Since KiCad v7 nightly: Missing name and number effects print both other tokens into 
         # the same line.
         # Constrained in: schematic/since_v7/test_symbolPinOptionalTokens
         if self.nameEffects is None and self.numberEffects is None:
-            expression += f' (name "{dequote(self.name)}") (number "{dequote(self.number)}")'
+            expression += f'{indent_char*(indent+1)}(name "{dequote(self.name)}")\n'
+            expression += f'{indent_char*(indent+1)}(number "{dequote(self.number)}")\n'
+              
         else:
-            expression += f'\n{indents}  (name "{dequote(self.name)}"{nameEffects})\n'
-            expression += f'{indents}  (number "{dequote(self.number)}"{numberEffects})\n'
+            expression += f'{indent_char*(indent+1)}(name "{dequote(self.name)}"\n'
+            expression += f'{indent_char*(indent+2)}{nameEffects}'
+            expression += f'{indent_char*(indent+2)})\n'
+
+            expression += f'{indent_char*(indent+1)}(number "{dequote(self.number)}"\n'
+            expression += f'{indent_char*(indent+2)}{numberEffects}'
+            expression += f'{indent_char*(indent+2)})\n'
+           
             newLineAdded = True
 
         # Alternative pins always generate a line break
@@ -202,9 +213,9 @@ class SymbolPin():
                 expression += alternativePin.to_sexpr(indent+2)
 
         if newLineAdded:
-            expression += f'{indents}){endline}'
+            expression += f'{indent_char*(indent+2)}){endline}'
         else:
-            expression += f'){endline}'
+            expression += f'{indent_char*(indent+1)}){endline}'
         return expression
 
 @dataclass
@@ -466,7 +477,7 @@ class Symbol():
         inbom = f'(in_bom {ibtext})' if self.inBom is not None else ''
         if self.onBoard is not None:
             obtext = 'yes' if self.onBoard else 'no'
-        excludefromsim = f'(exclude_from_sim {"yes" if self.excludeFromSim else "no"})'
+        excludefromsim = f'(exclude_from_sim {"yes" if self.excludeFromSim else "no"})' if self.excludeFromSim is not None else ''
         onboard = f'(on_board {obtext})' if self.onBoard is not None else ''
         power = f'(power)' if self.isPower else ''
         pnhide = f' hide' if self.pinNamesHide else ''
@@ -476,7 +487,7 @@ class Symbol():
         extends = f'(extends "{dequote(self.extends)}")' if self.extends is not None else ''
 
         expression = f'{indent_char * indent}(symbol "{dequote(self.libId)}"\n'
-        expression += f'{indent_char * (indent+1)}{excludefromsim}\n'
+        if excludefromsim: expression += f'{indent_char * (indent+1)}{excludefromsim}\n'
         if extends: expression += f'{indent_char * (indent+1)}{extends}\n'        
         if power: expression += f'{indent_char * (indent+1)}{power}\n'
         if pinnumbers: expression += f'{indent_char * (indent+1)}{pinnumbers}\n'

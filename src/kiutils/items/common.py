@@ -510,12 +510,12 @@ class Effects():
         hide = f'(hide yes)' if self.hide else ''
         href = f'(href "{dequote(self.href)}")' if self.href is not None else ''
 
-        expression =  f'{indent_char*indent}(effects{endline}'
-        expression += f'{self.font.to_sexpr(indent=indent+1)}{endline}'
-        if justify: expression += f'{indent_char*(indent+1)}{justify}{endline}'
-        if href: expression += f'{indent_char*(indent+1)}{href}{endline}'
-        if hide: expression += f'{indent_char*(indent+1)}{hide}{endline}'
-        expression += f'{indent_char*(indent)}){endline}'
+        expression =  f'{indent_char*indent}(effects\n'
+        expression += f'{self.font.to_sexpr(indent=indent+1)}\n'
+        if justify: expression += f'{indent_char*(indent+1)}{justify}\n'
+        if href: expression += f'{indent_char*(indent+1)}{href}\n'
+        if hide: expression += f'{indent_char*(indent+1)}{hide}\n'
+        expression += f'{indent_char*(indent)})\n'
         return expression
 
 
