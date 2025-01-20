@@ -349,7 +349,7 @@ class Font():
         Returns:
             - str: S-Expression of this object
         """
-        indents = '\t'*indent
+        indent_char = '\t'        
         endline = '\n' if newline else ''
         face_name, thickness, bold, italic, linespacing, color = '', '', '', '', '', ''
 
@@ -360,7 +360,15 @@ class Font():
         if self.lineSpacing is not None: linespacing = f' (line_spacing {self.lineSpacing})'
         if self.color is not None:       color = f' {self.color.to_sexpr()}'
 
-        expression = f'{indents}(font {face_name}(size {self.height} {self.width}){color}{thickness}{bold}{italic}{linespacing}){endline}'
+        expression = f'{indent_char * indent}(font\n'
+        if face_name: expression += f'{indent_char * (indent+1)}{face_name}\n'
+        expression += f'{indent_char * (indent+1)}(size {self.height} {self.width})\n'
+        if thickness: expression += f'{indent_char * (indent+1)}{thickness}\n'
+        if bold: expression += f'{indent_char * (indent+1)}{bold}\n'
+        if italic: expression += f'{indent_char * (indent+1)}{italic}\n'
+        if linespacing: expression += f'{indent_char * (indent+1)}{linespacing}\n'
+        if color: expression += f'{indent_char * (indent+1)}{color}\n'
+        expression += f'{indent_char*indent}){endline}'
         return expression
 
 @dataclass
@@ -495,14 +503,19 @@ class Effects():
         Returns:
             - str: S-Expression of this object
         """
-        indents = '\t'*indent
+        indent_char ='\t'        
         endline = '\n' if newline else ''
 
         justify = f' {self.justify.to_sexpr()}' if self.justify.to_sexpr() != '' else ''
-        hide = f' (hide yes)' if self.hide else ''
-        href = f' (href "{dequote(self.href)}")' if self.href is not None else ''
+        hide = f'(hide yes)' if self.hide else ''
+        href = f'(href "{dequote(self.href)}")' if self.href is not None else ''
 
-        expression =  f'{indents}(effects {self.font.to_sexpr()}{justify}{href}{hide}){endline}'
+        expression =  f'{indent_char*indent}(effects{endline}'
+        expression += f'{self.font.to_sexpr(indent=indent+1)}{endline}'
+        if justify: expression += f'{indent_char*(indent+1)}{justify}{endline}'
+        if href: expression += f'{indent_char*(indent+1)}{href}{endline}'
+        if hide: expression += f'{indent_char*(indent+1)}{hide}{endline}'
+        expression += f'{indent_char*(indent)}){endline}'
         return expression
 
 
@@ -868,17 +881,20 @@ class Property():
         Returns:
             - str: S-Expression of this object
         """
-        indents = '\t'*indent
+        indent_char = '\t'        
         endline = '\n' if newline else ''
 
         posA = f' {self.position.angle}' if self.position.angle is not None else ''
         id = f' (id {self.id})' if self.id is not None else ''
-        sn = ' (show_name)' if self.showName else ''
+        showName = '(show_name)' if self.showName else ''
 
-        expression =  f'{indents}(property "{dequote(self.key)}" "{dequote(self.value)}"{id} (at {self.position.X} {self.position.Y}{posA}){sn}'
+        
+        expression = f'{indent_char*(indent)}(property "{dequote(self.key)}" "{dequote(self.value)}"{id}\n'
+        expression += f'{indent_char*(indent+1)}(at {self.position.X} {self.position.Y}{posA})\n'
+        if showName: expression += f'{indent_char*(indent+1)}{showName}\n'
         if self.effects is not None:
-            expression += f'\n{self.effects.to_sexpr(indent+2)}'
-            expression += f'{indents}){endline}'
+            expression += f'{self.effects.to_sexpr(indent+1)}'
+            expression += f'{indent_char*(indent)}){endline}'
         else:
             expression += f'){endline}'
         return expression

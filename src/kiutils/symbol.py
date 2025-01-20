@@ -326,6 +326,10 @@ class Symbol():
     """The optional ``pinNamesOffset`` token defines the pin name offset for all pin names of the
     symbol. If not defined, the pin name offset is 0.508mm (0.020")"""
 
+    # TODO: Describe this token
+    excludeFromSim: Optional[bool] = None
+    """"The ``excludeFromSim`` token's documentation was not done yet .."""
+
     inBom: Optional[bool] = None
     """The optional ``inBom`` token, defines if a symbol is to be include in the bill of material
     output. If undefined, the token will not be generated in `self.to_sexpr()`."""
@@ -390,6 +394,7 @@ class Symbol():
                     else:
                         if property == 'hide': object.pinNamesHide = True
             if item[0] == 'in_bom': object.inBom = True if item[1] == 'yes' else False
+            if item[0] == 'exclude_from_sim': object.excludeFromSim = True if item[1] == 'yes' else False
             if item[0] == 'on_board': object.onBoard = True if item[1] == 'yes' else False
             if item[0] == 'power': object.isPower = True
 
@@ -424,6 +429,7 @@ class Symbol():
         """
         symbol = cls()
         symbol.inBom = True
+        symbol.excludeFromSim = False
         symbol.onBoard = True
         symbol.libId = id
         symbol.properties.extend(
@@ -460,6 +466,7 @@ class Symbol():
         inbom = f'(in_bom {ibtext})' if self.inBom is not None else ''
         if self.onBoard is not None:
             obtext = 'yes' if self.onBoard else 'no'
+        excludefromsim = f'(exclude_from_sim {"yes" if self.excludeFromSim else "no"})'
         onboard = f'(on_board {obtext})' if self.onBoard is not None else ''
         power = f'(power)' if self.isPower else ''
         pnhide = f' hide' if self.pinNamesHide else ''
@@ -469,8 +476,8 @@ class Symbol():
         extends = f'(extends "{dequote(self.extends)}")' if self.extends is not None else ''
 
         expression = f'{indent_char * indent}(symbol "{dequote(self.libId)}"\n'
-        if extends: expression += f'{indent_char * (indent+1)}{extends}\n'
-        # TODO: Exclude from sim
+        expression += f'{indent_char * (indent+1)}{excludefromsim}\n'
+        if extends: expression += f'{indent_char * (indent+1)}{extends}\n'        
         if power: expression += f'{indent_char * (indent+1)}{power}\n'
         if pinnumbers: expression += f'{indent_char * (indent+1)}{pinnumbers}\n'
         if pinnames: expression += f'{indent_char * (indent+1)}{pinnames}\n'
