@@ -74,7 +74,7 @@ class SymbolAlternativePin():
         Returns:
             - str: S-Expression of this object
         """
-        indents = ' '*indent
+        indents = '\t'*indent
         endline = '\n' if newline else ''
 
         return f'{indents}(alternate "{dequote(self.pinName)}" {self.electricalType} {self.graphicalStyle}){endline}'
@@ -172,7 +172,7 @@ class SymbolPin():
         Returns:
             - str: S-Expression of this object
         """
-        indents = ' '*indent
+        indents = '\t'*indent
         endline = '\n' if newline else ''
         newLineAdded = False
 
@@ -450,7 +450,7 @@ class Symbol():
         Returns:
             - str: S-Expression of this object
         """
-        indents = ' '*indent
+        indents = '\t'*indent
         endline = '\n' if newline else ''
         obtext, ibtext = '', ''
 
@@ -468,6 +468,7 @@ class Symbol():
         extends = f' (extends "{dequote(self.extends)}")' if self.extends is not None else ''
 
         expression =  f'{indents}(symbol "{dequote(self.libId)}"{extends}{power}{pinnumbers}{pinnames}{inbom}{onboard}\n'
+        
         for item in self.properties:
             expression += item.to_sexpr(indent+2)
         for item in self.graphicItems:
@@ -582,11 +583,16 @@ class SymbolLib():
         Returns:
             - str: S-Expression of this object
         """
-        indents = ' '*indent
-        endline = '\n' if newline else ''
+        indent_char = "\t"
+        indents = indent_char * indent
+        endline = "\n" if newline else ""
 
-        expression =  f'{indents}(kicad_symbol_lib (version {self.version}) (generator {self.generator})\n'
+        expression = f"{indent_char * indent}(kicad_symbol_lib\n"
+        expression += f"{indent_char * (indent+1)}(version {self.version})\n"
+        expression += f'{indent_char * (indent+1)}(generator "{self.generator}")\n'
+        expression += f'{indent_char * (indent+1)}(generator_version "8.0")\n'
+    
         for item in self.symbols:
-            expression += f'{indents}{item.to_sexpr(indent+2)}'
+            expression += f'{indents}{item.to_sexpr(indent+1)}'
         expression += f'{indents}){endline}'
         return expression

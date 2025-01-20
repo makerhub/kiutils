@@ -129,7 +129,7 @@ class Coordinate():
         Returns:
             - str: S-Expression of this object
         """
-        indents = ' '*indent
+        indents = '\t'*indent
         endline = '\n' if newline else ''
         return f'{indents}(xyz {self.X} {self.Y} {self.Z}){endline}'
 
@@ -191,7 +191,7 @@ class ColorRGBA():
         Returns:
             - str: S-Expression of this object
         """
-        indents = ' '*indent
+        indents = '\t'*indent
         endline = '\n' if newline else ''
 
         if self.precision is not None:
@@ -261,7 +261,7 @@ class Stroke():
         Returns:
             - str: S-Expression of this object
         """
-        indents = ' '*indent
+        indents = '\t'*indent
         endline = '\n' if newline else ''
         color = f' {self.color.to_sexpr()}' if self.color is not None else ''
         the_type = f' (type {self.type})' if self.type is not None else ''
@@ -349,7 +349,7 @@ class Font():
         Returns:
             - str: S-Expression of this object
         """
-        indents = ' '*indent
+        indents = '\t'*indent
         endline = '\n' if newline else ''
         face_name, thickness, bold, italic, linespacing, color = '', '', '', '', '', ''
 
@@ -420,7 +420,7 @@ class Justify():
               and newline settings) if no justification is given. This will cause the text to be
               horizontally and vertically aligend
         """
-        indents = ' '*indent
+        indents = '\t'*indent
         endline = '\n' if newline else ''
 
         if self.horizontally is None and self.vertically is None and self.mirror == False:
@@ -495,7 +495,7 @@ class Effects():
         Returns:
             - str: S-Expression of this object
         """
-        indents = ' '*indent
+        indents = '\t'*indent
         endline = '\n' if newline else ''
 
         justify = f' {self.justify.to_sexpr()}' if self.justify.to_sexpr() != '' else ''
@@ -551,7 +551,7 @@ class Net():
         Returns:
             - str: S-Expression of this object
         """
-        indents = ' '*indent
+        indents = '\t'*indent
         endline = '\n' if newline else ''
 
         return f'{indents}(net {self.number} "{dequote(self.name)}"){endline}'
@@ -618,7 +618,7 @@ class Group():
         Returns:
             - str: S-Expression of this object
         """
-        indents = ' '*indent
+        indents = '\t'*indent
         endline = '\n' if newline else ''
         locked = f' locked' if self.locked else ''
 
@@ -700,7 +700,7 @@ class PageSettings():
         Returns:
             - str: S-Expression of this object
         """
-        indents = ' '*indent
+        indents = '\t'*indent
         endline = '\n' if newline else ''
 
         width, height = '', ''
@@ -775,7 +775,7 @@ class TitleBlock():
         Returns:
             - str: S-Expression of this object
         """
-        indents = ' '*indent
+        indents = '\t'*indent
         endline = '\n' if newline else ''
 
         expression =  f'{indents}(title_block\n'
@@ -868,7 +868,7 @@ class Property():
         Returns:
             - str: S-Expression of this object
         """
-        indents = ' '*indent
+        indents = '\t'*indent
         endline = '\n' if newline else ''
 
         posA = f' {self.position.angle}' if self.position.angle is not None else ''
@@ -930,7 +930,7 @@ class RenderCachePolygon():
         Returns:
             - str: S-Expression of this object
         """
-        indents = ' '*indent
+        indents = '\t'*indent
         endline = '\n' if newline else ''
 
         expression = f'{indents}(polygon\n'
@@ -1004,7 +1004,7 @@ class RenderCache():
         Returns:
             - str: S-Expression of this object
         """
-        indents = ' '*indent
+        indents = '\t'*indent
         endline = '\n' if newline else ''
 
         expression = f'{indents}(render_cache "{dequote(self.text)}" {self.id}\n'
@@ -1069,7 +1069,7 @@ class Fill():
         Returns:
             - str: S-Expression of this object
         """
-        indents = ' '*indent
+        indents = '\t'*indent
         endline = '\n' if newline else ''
         color = f' {self.color.to_sexpr()}' if self.color is not None else ''
 
@@ -1142,7 +1142,7 @@ class Image():
         Returns:
             - str: S-Expression of this object
         """
-        indents = ' '*indent
+        indents = '\t'*indent
         endline = '\n' if newline else ''
 
         scale = f' (scale {self.scale})' if self.scale is not None else ''
