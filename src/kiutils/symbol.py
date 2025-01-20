@@ -450,34 +450,42 @@ class Symbol():
         Returns:
             - str: S-Expression of this object
         """
-        indents = '\t'*indent
+        indent_char = '\t'
+        #indents = '\t' * indent
         endline = '\n' if newline else ''
         obtext, ibtext = '', ''
 
         if self.inBom is not None:
             ibtext = 'yes' if self.inBom else 'no'
-        inbom = f' (in_bom {ibtext})' if self.inBom is not None else ''
+        inbom = f'(in_bom {ibtext})' if self.inBom is not None else ''
         if self.onBoard is not None:
             obtext = 'yes' if self.onBoard else 'no'
-        onboard = f' (on_board {obtext})' if self.onBoard is not None else ''
-        power = f' (power)' if self.isPower else ''
+        onboard = f'(on_board {obtext})' if self.onBoard is not None else ''
+        power = f'(power)' if self.isPower else ''
         pnhide = f' hide' if self.pinNamesHide else ''
-        pnoffset = f' (offset {self.pinNamesOffset})' if self.pinNamesOffset is not None else ''
-        pinnames = f' (pin_names{pnoffset}{pnhide})' if self.pinNames else ''
-        pinnumbers = f' (pin_numbers hide)' if self.hidePinNumbers else ''
-        extends = f' (extends "{dequote(self.extends)}")' if self.extends is not None else ''
+        pnoffset = f'(offset {self.pinNamesOffset})' if self.pinNamesOffset is not None else ''
+        pinnames = f'(pin_names{pnoffset}{pnhide})' if self.pinNames else ''
+        pinnumbers = f'(pin_numbers hide)' if self.hidePinNumbers else ''
+        extends = f'(extends "{dequote(self.extends)}")' if self.extends is not None else ''
 
-        expression =  f'{indents}(symbol "{dequote(self.libId)}"{extends}{power}{pinnumbers}{pinnames}{inbom}{onboard}\n'
-        
+        expression = f'{indent_char * indent}(symbol "{dequote(self.libId)}"\n'
+        if extends: expression += f'{indent_char * (indent+1)}{extends}\n'
+        # TODO: Exclude from sim
+        if power: expression += f'{indent_char * (indent+1)}{power}\n'
+        if pinnumbers: expression += f'{indent_char * (indent+1)}{pinnumbers}\n'
+        if pinnames: expression += f'{indent_char * (indent+1)}{pinnames}\n'
+        if inbom: expression += f'{indent_char * (indent+1)}{inbom}\n'
+        if onboard: expression += f'{indent_char * (indent+1)}{onboard}\n'
+
         for item in self.properties:
-            expression += item.to_sexpr(indent+2)
+            expression += item.to_sexpr(indent + 1)
         for item in self.graphicItems:
-            expression += item.to_sexpr(indent+2)
+            expression += item.to_sexpr(indent + 1)
         for item in self.pins:
-            expression += item.to_sexpr(indent+2)
+            expression += item.to_sexpr(indent + 1)
         for item in self.units:
-            expression += item.to_sexpr(indent+2)
-        expression += f'{indents}){endline}'
+            expression += item.to_sexpr(indent + 1)
+        expression += f'{indent_char * (indent+1)}){endline}'
         return expression
 
 @dataclass
