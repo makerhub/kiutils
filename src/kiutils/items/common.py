@@ -359,7 +359,7 @@ class Font():
         endline = '\n' if newline else ''
         face_name, thickness, bold, italic, linespacing, color = '', '', '', '', '', ''
 
-        if self.face is not None:        face_name = f'(face "{dequote(self.face)}") '
+        if self.face is not None:        face_name = f'(face "{dequote(self.face)}")'
         if self.thickness is not None:   thickness = f'(thickness {self.thickness})'
         if self.bold == True:            bold = '(bold yes)'
         if self.italic == True:          italic = '(italic yes)'
@@ -512,7 +512,7 @@ class Effects():
         indent_char ='\t'        
         endline = '\n' if newline else ''
 
-        justify = f' {self.justify.to_sexpr()}' if self.justify.to_sexpr() != '' else ''
+        justify = f'{self.justify.to_sexpr()}' if self.justify.to_sexpr() != '' else ''
         hide = f'(hide yes)' if self.hide else ''
         href = f'(href "{dequote(self.href)}")' if self.href is not None else ''
 

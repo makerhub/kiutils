@@ -183,9 +183,10 @@ class SymbolPin():
 
         expression =  f'{indent_char*indent}(pin {self.electricalType} {self.graphicalStyle}\n'
         expression += f'{indent_char*(indent+1)}(at {self.position.X} {self.position.Y}{posA})\n'
-        expression +=  f'{indent_char*(indent+1)}(length {self.length})\n'
-        if hide != '': expression +=f'{indent_char*(indent+1)}{hide}\n'
-        
+        expression +=  f'{indent_char*(indent+1)}(length {self.length})'
+        if hide != '': expression +=f'{hide}\n'
+        else : expression += '\n'
+                
         # Since KiCad v7 nightly: Missing name and number effects print both other tokens into 
         # the same line.
         # Constrained in: schematic/since_v7/test_symbolPinOptionalTokens
@@ -213,10 +214,10 @@ class SymbolPin():
                 expression += '\n' 
             newLineAdded = True
             for alternativePin in self.alternatePins:
-                expression += alternativePin.to_sexpr(indent+2)
+                expression += alternativePin.to_sexpr(indent+1)
 
         
-        expression += f'{indent_char*(indent)}){endline}'
+        expression += f'{indent_char*(indent)}){endline}'       
         return expression
 
 @dataclass
@@ -511,6 +512,7 @@ class Symbol():
         for item in self.units:
             expression += item.to_sexpr(indent + 1)
         expression += f'{indent_char * indent}){endline}'
+        
         return expression
 
 @dataclass

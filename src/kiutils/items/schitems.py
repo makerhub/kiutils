@@ -482,23 +482,23 @@ class Text():
         Returns:
             - str: S-Expression of this object
         """
-        indents = ' '*indent
+        indent_char = '\t'        
         endline = '\n' if newline else ''
 
         posA = f' {self.position.angle}' if self.position.angle is not None else ''
 
-        expression =  f'{indents}(text "{dequote(self.text)}"'
+        expression =  f'{indent_char*indent}(text "{dequote(self.text)}"'
 
         # Strings longer or equal than 50 chars have the position in the next line
         if len(self.text) >= 50:
-            expression += f'\n{indents}  '
+            expression += f'\n{indent_char*indent}  '
         else:
             expression += ' '
         expression += f'(at {self.position.X} {self.position.Y}{posA})\n'
         expression += self.effects.to_sexpr(indent+2)
         if self.uuid is not None:
-            expression += f'{indents}  (uuid {self.uuid})\n'
-        expression += f'{indents}){endline}'
+            expression += f'{indent_char*indent} (uuid {self.uuid})\n'
+        expression += f'{indent_char*indent}){endline}'
         return expression
 
 @dataclass
@@ -1740,15 +1740,18 @@ class Arc():
         Returns:
             - str: S-Expression of this object
         """
-        indents = ' '*indent
+        indent_char = '\t'        
         endline = '\n' if newline else ''
 
-        expression =  f'{indents}(arc (start {self.start.X} {self.start.Y}) (mid {self.mid.X} {self.mid.Y}) (end {self.end.X} {self.end.Y})\n'
+        expression =  f'{indent_char*indent}(arc'
+        expression += f'{indent_char*(indent+1)}(start {self.start.X} {self.start.Y})\n'
+        expression += f'{indent_char*(indent+1)}(mid {self.mid.X} {self.mid.Y})\n'
+        expression += f'{indent_char*(indent+1)}(end {self.end.X} {self.end.Y})\n'
         expression += self.stroke.to_sexpr(indent+2)
         expression += self.fill.to_sexpr(indent+2)
         if self.uuid is not None:
-            expression += f'{indents}  (uuid {self.uuid})\n'
-        expression += f'{indents}){endline}'
+            expression += f'{indent_char*indent} (uuid {self.uuid})\n'
+        expression += f'{indent_char*indent}){endline}'
         return expression
 
 @dataclass

@@ -95,7 +95,7 @@ class SyArc():
         Returns:
             - str: S-Expression of this object
         """
-        indents = ' '*indent
+        indent_char = '\t'        
         endline = '\n' if newline else ''
 
         startA = f' {self.start.angle}' if self.start.angle is not None else ''
@@ -103,10 +103,13 @@ class SyArc():
         endA = f' {self.end.angle}' if self.end.angle is not None else ''
         private = ' private' if self.private else ''
 
-        expression =  f'{indents}(arc{private} (start {self.start.X} {self.start.Y}{startA}) (mid {self.mid.X} {self.mid.Y}{midA}) (end {self.end.X} {self.end.Y}{endA})\n'
-        expression += self.stroke.to_sexpr(indent+2)
-        expression += self.fill.to_sexpr(indent+2)
-        expression += f'{indents}){endline}'
+        expression =  f'{indent_char*indent}(arc{private}\n'
+        expression += f'{indent_char*(indent+1)}(start {self.start.X} {self.start.Y}{startA})\n'
+        expression += f'{indent_char*(indent+1)}(mid {self.mid.X} {self.mid.Y}{midA})\n' 
+        expression += f'{indent_char*(indent+1)}(end {self.end.X} {self.end.Y}{endA})\n'
+        expression += self.stroke.to_sexpr(indent+1)
+        expression += self.fill.to_sexpr(indent+1)
+        expression += f'{indent_char*indent}){endline}'
         return expression
 
 @dataclass
@@ -177,14 +180,16 @@ class SyCircle():
         Returns:
             - str: S-Expression of this object
         """
-        indents = ' '*indent
+        indent_char = '\t'
         endline = '\n' if newline else ''
         private = ' private' if self.private else ''
 
-        expression =  f'{indents}(circle{private} (center {self.center.X} {self.center.Y}) (radius {self.radius})\n'
-        expression += self.stroke.to_sexpr(indent+2)
-        expression += self.fill.to_sexpr(indent+2)
-        expression += f'{indents}){endline}'
+        expression =  f'{indent_char*indent}(circle{private}\n'
+        expression +=  f'{indent_char*(indent+1)}(center {self.center.X} {self.center.Y})\n'
+        expression +=  f'{indent_char*(indent+1)}(radius {self.radius})\n'
+        expression += self.stroke.to_sexpr(indent+1)
+        expression += self.fill.to_sexpr(indent+1)
+        expression += f'{indent_char*indent}){endline}'
         return expression
 
 @dataclass
@@ -323,8 +328,8 @@ class SyPolyLine():
             if index < len(self.points)-1: expression += ' '
 
         expression += f'\n{indent_char*(indent+1)})\n'
-        expression += self.stroke.to_sexpr(indent+2)
-        expression += self.fill.to_sexpr(indent+2)
+        expression += self.stroke.to_sexpr(indent+1)
+        expression += self.fill.to_sexpr(indent+1)
         expression += f'{indent_char*indent}){endline}'
         return expression
 
@@ -462,14 +467,15 @@ class SyText():
         Returns:
             - str: S-Expression of this object
         """
-        indents = ' '*indent
+        indent_char = '\t'        
         endline = '\n' if newline else ''
 
         posA = f' {self.position.angle}' if self.position.angle is not None else ''
 
-        expression =  f'{indents}(text "{dequote(self.text)}" (at {self.position.X} {self.position.Y}{posA})\n'
-        expression += f'{indents}  {self.effects.to_sexpr()}'
-        expression += f'{indents}){endline}'
+        expression =  f'{indent_char*indent}(text "{dequote(self.text)}"\n' 
+        expression += f'{indent_char*(indent+1)}(at {self.position.X} {self.position.Y}{posA})\n'
+        expression += f'{self.effects.to_sexpr(indent=indent+1)}'
+        expression += f'{indent_char*indent}){endline}'
         return expression
 
 @dataclass
