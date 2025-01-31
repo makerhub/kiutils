@@ -20,7 +20,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Optional, List, Dict
 
-from kiutils.utils.strings import dequote
+from kiutils.utils.strings import dequote, float_to_kicad_str
 
 @dataclass
 class Position():
@@ -896,7 +896,7 @@ class Property():
 
         
         expression = f'{indent_char*(indent)}(property "{dequote(self.key)}" "{dequote(self.value)}"{id}\n'
-        expression += f'{indent_char*(indent+1)}(at {self.position.X} {self.position.Y}{posA})\n'
+        expression += f'{indent_char*(indent+1)}(at {float_to_kicad_str(self.position.X)} {float_to_kicad_str(self.position.Y)}{posA})\n'
         if showName: expression += f'{indent_char*(indent+1)}{showName}\n'
         if self.effects is not None:
             expression += f'{self.effects.to_sexpr(indent+1)}'

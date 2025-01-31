@@ -22,7 +22,7 @@ import re
 from kiutils.items.common import Effects, Position, Property, Font
 from kiutils.items.syitems import *
 from kiutils.utils import sexpr
-from kiutils.utils.strings import dequote
+from kiutils.utils.strings import dequote, float_to_kicad_str
 from kiutils.misc.config import KIUTILS_CREATE_NEW_VERSION_STR
 
 @dataclass
@@ -182,7 +182,7 @@ class SymbolPin():
         #numberEffects = f'{self.numberEffects.to_sexpr(newline=True)}' if self.numberEffects is not None else ''
 
         expression =  f'{indent_char*indent}(pin {self.electricalType} {self.graphicalStyle}\n'
-        expression += f'{indent_char*(indent+1)}(at {self.position.X} {self.position.Y}{posA})\n'
+        expression += f'{indent_char*(indent+1)}(at {float_to_kicad_str(self.position.X)} {float_to_kicad_str(self.position.Y)}{posA})\n'
         expression +=  f'{indent_char*(indent+1)}(length {self.length})'
         if hide != '': expression +=f'{hide}\n'
         else : expression += '\n'
@@ -427,7 +427,7 @@ class Symbol():
 
     @classmethod
     def create_new(cls, id: str, reference: str, value: str,
-                        footprint: str = "", datasheet: str = "") -> Symbol:
+                        footprint: str = "", datasheet: str = "", description: str = "") -> Symbol:
         """Creates a new empty symbol as KiCad would create it
 
         Args:
@@ -454,6 +454,8 @@ class Symbol():
                 Property(key = "Footprint", value = footprint, id = 2,
                          effects = Effects(font=Font(width=1.27, height=1.27), hide=True)),
                 Property(key = "Datasheet", value = datasheet, id = 3,
+                         effects = Effects(font=Font(width=1.27, height=1.27), hide=True)),
+                Property(key = "Description", value = description, id = 4,
                          effects = Effects(font=Font(width=1.27, height=1.27), hide=True))
             ]
         )

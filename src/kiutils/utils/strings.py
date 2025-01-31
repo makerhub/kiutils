@@ -34,3 +34,23 @@ def remove_prefix(input: str, prefix: str) -> str:
         - str: String with removed prefix, or the ``input`` string as is, if the prefix was not found
     """
     return input[len(prefix):] if input.startswith(prefix) else input
+
+def float_to_kicad_str(number: float, precision: int = None) -> str:
+    """Converts a float to a string, adding or removing trailing zeros based on the specified precision
+
+    Args:
+        - number (float): Number to convert
+        - precision (int, optional): Number of digits of precision
+
+    Returns:
+        - str: Number as string
+    """
+    if precision is not None:
+        format_str = f"{{:.{precision}f}}"
+        formatted_number = format_str.format(number)
+        if '.' in formatted_number:
+            integer_part, decimal_part = formatted_number.split('.')
+            if len(decimal_part) < precision:
+                formatted_number = f"{integer_part}.{decimal_part.ljust(precision, '0')}"
+        return formatted_number       
+    return str(number).rstrip('0').rstrip('.') if '.' in str(number) else str(number)
