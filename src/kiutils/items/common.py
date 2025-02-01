@@ -267,7 +267,7 @@ class Stroke():
         expression = f'{indent_char * indent}(stroke\n'
         expression += f'{indent_char * (indent+1)}(width {self.width})\n'
         if self.type: expression += f'{indent_char * (indent+1)}(type {self.type})\n'
-        if self.color: expression += self.color.to_sexpr(indent+1)
+        if self.color: expression += self.color.to_sexpr(indent+1, True)
         expression += f'{indent_char*indent}){endline}'
         return expression
 
@@ -1096,7 +1096,7 @@ class Fill():
 
         expression = f'{indent_char * indent}(fill\n'
         if self.type: expression += f'{indent_char * (indent+1)}(type {self.type})\n'
-        if self.color: expression += self.color.to_sexpr(indent+1)
+        if self.color: expression += self.color.to_sexpr(indent+1, True)
         expression += f'{indent_char * indent}){endline}'
         
         return expression

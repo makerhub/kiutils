@@ -20,7 +20,7 @@ from dataclasses import dataclass, field
 from typing import Optional, List, Dict
 
 from kiutils.items.common import Fill, Position, ColorRGBA, ProjectInstance, Stroke, Effects, Property
-from kiutils.utils.strings import dequote
+from kiutils.utils.strings import dequote, float_to_kicad_str
 
 @dataclass
 class Junction():
@@ -572,19 +572,20 @@ class TextBox():
         Returns:
             - str: S-Expression of this object
         """
-        indents = ' '*indent
+        indent_char = '\t'        
         endline = '\n' if newline else ''
 
         posA = f' {self.position.angle}' if self.position.angle is not None else ''
 
-        expression =  f'{indents}(text_box "{dequote(self.text)}"\n'
-        expression += f'{indents}  (at {self.position.X} {self.position.Y}{posA}) (size {self.size.X} {self.size.Y})\n'
-        expression += self.stroke.to_sexpr(indent+2)
-        expression += self.fill.to_sexpr(indent+2)
-        expression += self.effects.to_sexpr(indent+2)
+        expression =  f'{indent_char*indent}(text_box "{dequote(self.text)}"\n'
+        expression += f'{indent_char*(indent+1)}(at {float_to_kicad_str(self.position.X)} {float_to_kicad_str(self.position.Y)}{posA})\n'
+        expression += f'{indent_char*(indent+1)}(size {float_to_kicad_str(self.size.X)} {float_to_kicad_str(self.size.Y)})\n'
+        expression += self.stroke.to_sexpr(indent+1)
+        expression += self.fill.to_sexpr(indent+1)
+        expression += self.effects.to_sexpr(indent+1)
         if self.uuid is not None:
-            expression += f'{indents}  (uuid {self.uuid})\n'
-        expression += f'{indents}){endline}'
+            expression += f'{indent_char*indent}(uuid {self.uuid})\n'
+        expression += f'{indent_char*indent}){endline}'
         return expression
 
 @dataclass
