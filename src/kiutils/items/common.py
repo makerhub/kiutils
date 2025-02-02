@@ -838,6 +838,9 @@ class Property():
     """The ``position`` defines the X and Y coordinates as well as the rotation angle of the property.
     All three items will initially be set to zero."""
 
+    doNotAutoPlace: bool = False
+    """TODO: Document"""
+
     effects: Optional[Effects] = None
     """The optional ``effects`` section defines how the text is displayed"""
 
@@ -875,6 +878,7 @@ class Property():
             if item[0] == 'at': object.position = Position().from_sexpr(item)
             if item[0] == 'effects': object.effects = Effects().from_sexpr(item)
             if item[0] == 'show_name': object.showName = True
+            if item[0] == 'do_not_autoplace': object.doNotAutoPlace = True
         return object
 
     def to_sexpr(self, indent: int = 4, newline: bool = True) -> str:
@@ -893,11 +897,13 @@ class Property():
         posA = f' {self.position.angle}' if self.position.angle is not None else ''
         id = f' (id {self.id})' if self.id is not None else ''
         showName = '(show_name)' if self.showName else ''
+        doNotAutoplace = '(do_not_autoplace)' if self.doNotAutoPlace else ''
 
         
         expression = f'{indent_char*(indent)}(property "{dequote(self.key)}" "{dequote(self.value)}"{id}\n'
         expression += f'{indent_char*(indent+1)}(at {float_to_kicad_str(self.position.X)} {float_to_kicad_str(self.position.Y)}{posA})\n'
         if showName: expression += f'{indent_char*(indent+1)}{showName}\n'
+        if doNotAutoplace: expression += f'{indent_char*(indent+1)}{doNotAutoplace}\n'
         if self.effects is not None:
             expression += f'{self.effects.to_sexpr(indent+1)}'
             expression += f'{indent_char*(indent)}){endline}'
