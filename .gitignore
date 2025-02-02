@@ -2,6 +2,9 @@
 *.testoutput*
 reports/*
 
+# Test Kicad Projects
+tests/kicad_projects
+
 # Temporary files of linters, cov-checks, etc.
 .pytest_cache
 .coverage

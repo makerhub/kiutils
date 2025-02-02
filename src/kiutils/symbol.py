@@ -403,7 +403,9 @@ class Symbol():
                 object.pinNames = True
                 for property in item[1:]:
                     if type(property) == type([]):
-                        if property[0] == 'offset': object.pinNamesOffset = property[1]
+                        if property[0] == 'offset': 
+                            object.pinNamesOffset = property[1]                            
+                            object.pinNamesHide = False if len(property) < 3 else property[2] == "hide"
                     else:
                         if property == 'hide': object.pinNamesHide = True
             if item[0] == 'in_bom': object.inBom = True if item[1] == 'yes' else False
@@ -493,11 +495,20 @@ class Symbol():
         if power: expression += f'{indent_char * (indent+1)}{power}\n'
         #pin_numbers
         if pinnumbers: expression += f'{indent_char * (indent+1)}{pinnumbers}\n' 
-        #pin_names
-        if self.pinNames: expression += f'{indent_char * (indent+1)}(pin_names\n'
-        if self.pinNamesOffset: expression += f'{indent_char * (indent+2)}(offset {self.pinNamesOffset})\n'
-        if self.pinNamesHide: expression += f'{indent_char * (indent+2)}(hide {self.pinNamesHide})\n'
-        if self.pinNames: expression += f'{indent_char * (indent+1)})\n'       
+        # pin_names
+        if self.pinNames:
+            expression += f'{indent_char * (indent+1)}(pin_names'
+
+            if not self.pinNamesOffset == None:
+                expression += f'\n{indent_char * (indent+2)}(offset {self.pinNamesOffset})'
+                # if self.pinNamesHide:
+                #     expression += f' hide)\n'
+
+            if self.pinNamesHide:
+                expression += f' hide)\n'
+            else:
+                expression += f'\n{indent_char * (indent+1)})\n'
+
         # exclude_from_sim
         if excludefromsim: expression += f'{indent_char * (indent+1)}{excludefromsim}\n'
         # in_bom
